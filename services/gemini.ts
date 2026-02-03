@@ -1,17 +1,24 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { FAQItem, ChatMessage } from '../types';
-import { WHATSAPP_NUMBER } from '../constants';
+import { FAQItem, ChatMessage } from '../types.ts';
+import { WHATSAPP_NUMBER } from '../constants.tsx';
 
 export class AIChatService {
-  private ai: GoogleGenAI;
+  private ai: GoogleGenAI | null = null;
   private modelName = 'gemini-3-flash-preview';
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    const apiKey = typeof process !== 'undefined' ? process.env?.API_KEY : '';
+    if (apiKey) {
+      this.ai = new GoogleGenAI({ apiKey });
+    }
   }
 
   async getResponse(history: ChatMessage[], userMessage: string, faqs: FAQItem[]): Promise<string> {
+    if (!this.ai) {
+      return `I'm currently in offline mode. Please contact us on WhatsApp at ${WHATSAPP_NUMBER} for direct help!`;
+    }
+
     const faqContext = faqs.map(f => `Q: ${f.question}\nA: ${f.answer}`).join('\n\n');
     
     const systemInstruction = `

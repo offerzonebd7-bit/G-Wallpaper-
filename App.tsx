@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Wallpaper, Category } from './types';
-import { getWallpapers, getLogo, getTheme, saveTheme } from './services/storage';
-import { BRAND_NAME, FB_LINK, TELEGRAM_LINK, ADMIN_PASSWORD, Icons } from './constants';
-import WallpaperCard from './components/WallpaperCard';
-import AIChatbot from './components/AIChatbot';
-import AdminPanel from './components/AdminPanel';
+import { Wallpaper, Category } from './types.ts';
+import { getWallpapers, getLogo, getTheme, saveTheme } from './services/storage.ts';
+import { BRAND_NAME, FB_LINK, TELEGRAM_LINK, ADMIN_PASSWORD, Icons } from './constants.tsx';
+import WallpaperCard from './components/WallpaperCard.tsx';
+import AIChatbot from './components/AIChatbot.tsx';
+import AdminPanel from './components/AdminPanel.tsx';
 
 const App: React.FC = () => {
   const [wallpapers, setWallpapers] = useState<Wallpaper[]>([]);
@@ -18,7 +18,8 @@ const App: React.FC = () => {
   const [logo, setLogo] = useState<string | null>(getLogo());
 
   const refreshData = () => {
-    setWallpapers(getWallpapers());
+    const data = getWallpapers();
+    setWallpapers(data);
     setLogo(getLogo());
   };
 
@@ -156,13 +157,15 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h3 className="font-black text-2xl tracking-tighter mb-4 uppercase">{BRAND_NAME}</h3>
           <div className="flex justify-center gap-8 mb-6">
-            <a href={FB_LINK} className="text-slate-500 hover:text-blue-600 flex items-center gap-1"><Icons.Facebook className="w-4 h-4" /> Facebook</a>
-            <a href={TELEGRAM_LINK} className="text-slate-500 hover:text-cyan-500 flex items-center gap-1"><Icons.Telegram className="w-4 h-4" /> Telegram</a>
+            <a href={FB_LINK} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-blue-600 flex items-center gap-1"><Icons.Facebook className="w-4 h-4" /> Facebook</a>
+            <a href={TELEGRAM_LINK} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-500 flex items-center gap-1"><Icons.Telegram className="w-4 h-4" /> Telegram</a>
           </div>
           <div className="space-y-4">
             <p className="text-slate-400 text-sm italic">High Quality Digital Art & Premium Wallpapers.</p>
-            <div className="inline-block px-4 py-2 bg-cyan-600/10 rounded-full">
-              <p className="text-cyan-600 dark:text-cyan-400 text-xs font-black uppercase tracking-[0.2em]">App developed by Graphico Global</p>
+            <div className="inline-block px-6 py-2 bg-cyan-600/10 rounded-full border border-cyan-500/20">
+              <p className="text-cyan-600 dark:text-cyan-400 text-xs font-black uppercase tracking-[0.2em] animate-pulse">
+                App developed by Graphico Global
+              </p>
             </div>
             <p className="text-slate-500 text-[10px] mt-8">© {new Date().getFullYear()} Graphico Global. All rights reserved.</p>
           </div>

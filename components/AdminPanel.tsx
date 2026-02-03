@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Category, Wallpaper, FAQItem } from '../types';
-import { saveWallpaper, getFAQs, saveFAQs, getLogo, saveLogo } from '../services/storage';
-import { ADMIN_PASSWORD } from '../constants';
+import { Category, Wallpaper, FAQItem } from '../types.ts';
+import { saveWallpaper, getFAQs, saveFAQs, getLogo, saveLogo } from '../services/storage.ts';
+import { ADMIN_PASSWORD } from '../constants.tsx';
 
 interface AdminPanelProps {
   onClose: () => void;
@@ -39,7 +39,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
       img.src = base64;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 800; // Smaller size for localStorage compatibility
+        const MAX_WIDTH = 800;
         const MAX_HEIGHT = 800;
         let width = img.width;
         let height = img.height;
@@ -60,7 +60,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.6)); // Lower quality for better storage support
+        resolve(canvas.toDataURL('image/jpeg', 0.6));
       };
     });
   };
@@ -68,8 +68,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("ইমেজটি অনেক বড়! ২ এমবির নিচের ছবি ব্যবহার করুন।");
+      if (file.size > 5 * 1024 * 1024) {
+        alert("ইমেজটি অনেক বড়! ৫ এমবির নিচের ছবি ব্যবহার করুন।");
         return;
       }
       const reader = new FileReader();
@@ -106,7 +106,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
     
     if (success) {
       setUploadStatus('success');
-      // Reset fields for new upload
       setTitle('');
       setDescription('');
       setCode('');
@@ -114,10 +113,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       
+      // ড্যাশবোর্ড রিফ্রেশ করুন
       onRefresh();
     } else {
       setUploadStatus('error');
-      alert("আপলোড ব্যর্থ হয়েছে! ছবিটির সাইজ কমিয়ে আবার চেষ্টা করুন।");
+      alert("আপলোড ব্যর্থ হয়েছে! ব্রাউজারের স্টোরেজ পূর্ণ হতে পারে।");
     }
     
     setIsUploading(false);
@@ -153,7 +153,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
         <h2 className="text-xl font-bold text-cyan-400">Admin Control Center</h2>
         <div className="flex gap-2">
           <button onClick={onClose} className="text-xs bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors">
-            Home
+            Back
           </button>
           <button onClick={() => window.location.reload()} className="text-xs bg-red-600 hover:bg-red-500 px-4 py-2 rounded-lg font-bold">
             Sign Out
@@ -186,12 +186,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
         {activeTab === 'upload' && (
           <div className="space-y-6">
             {uploadStatus === 'success' && (
-              <div className="bg-green-500/20 border border-green-500 text-green-400 p-4 rounded-xl flex items-center justify-between animate-bounce">
+              <div className="bg-green-500/20 border border-green-500 text-green-400 p-4 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-2">
                 <span className="font-bold flex items-center gap-2">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
-                  আপলোড সফল হয়েছে! ড্যাশবোর্ডে গিয়ে চেক করুন।
+                  আপলোড সফল হয়েছে!
                 </span>
-                <button onClick={() => setUploadStatus('idle')} className="text-xs font-bold underline">নতুন আরেকটি দিন</button>
+                <button onClick={() => setUploadStatus('idle')} className="text-xs font-bold underline px-3 py-1 bg-green-500/20 rounded">নতুন আপলোড</button>
               </div>
             )}
 
@@ -232,7 +232,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
                     {imagePreview && (
                       <div className="relative">
                         <img src={imagePreview} className="w-20 h-20 object-cover rounded-lg border border-cyan-500/50" alt="Preview" />
-                        <span className="absolute -top-2 -right-2 bg-cyan-600 text-white text-[8px] px-1 rounded">Selected</span>
                       </div>
                     )}
                   </div>
@@ -254,7 +253,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
             <h3 className="text-xl font-bold">Store Logo</h3>
             <div className="space-y-4">
               {currentLogo && <img src={currentLogo} className="h-16 object-contain p-2 bg-white/5 rounded" alt="Logo" />}
-              <input type="file" accept="image/*" onChange={handleLogoUpload} className="w-full text-sm file:bg-amber-600 file:text-white file:border-0 file:rounded-full file:px-4 file:py-2" />
+              <input type="file" accept="image/*" onChange={handleLogoUpload} className="w-full text-sm file:bg-amber-600 file:text-white file:border-0 file:rounded-full file:px-4 file:py-2 cursor-pointer" />
             </div>
           </div>
         )}
@@ -277,7 +276,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ onClose, onRefresh }) => {
         )}
       </main>
       
-      <footer className="p-6 text-center text-slate-500 text-[10px] uppercase tracking-[0.2em] opacity-50">
+      <footer className="p-6 text-center text-slate-500 text-[10px] uppercase tracking-[0.2em] opacity-70 border-t border-white/5">
         App developed by Graphico Global
       </footer>
     </div>
