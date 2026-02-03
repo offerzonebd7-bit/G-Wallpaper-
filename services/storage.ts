@@ -26,25 +26,22 @@ const INITIAL_WALLPAPERS: Wallpaper[] = [
     category: Category.BANGLA,
     price: 5.99,
     createdAt: Date.now()
-  },
-  {
-    id: '3',
-    code: 'GG-103',
-    title: 'Calligraphy Flow',
-    imageUrl: 'https://picsum.photos/seed/calligraphy/1080/1920',
-    category: Category.CALLIGRAPHY,
-    price: 0,
-    createdAt: Date.now()
   }
 ];
 
 export const getWallpapers = (): Wallpaper[] => {
-  const data = localStorage.getItem(KEYS.WALLPAPERS);
-  if (!data) {
+  try {
+    const data = localStorage.getItem(KEYS.WALLPAPERS);
+    if (!data) {
+      localStorage.setItem(KEYS.WALLPAPERS, JSON.stringify(INITIAL_WALLPAPERS));
+      return INITIAL_WALLPAPERS;
+    }
+    return JSON.parse(data);
+  } catch (e) {
+    console.error("Corrupted wallpapers data, resetting...");
     localStorage.setItem(KEYS.WALLPAPERS, JSON.stringify(INITIAL_WALLPAPERS));
     return INITIAL_WALLPAPERS;
   }
-  return JSON.parse(data);
 };
 
 export const saveWallpaper = (wallpaper: Wallpaper): boolean => {
@@ -54,17 +51,18 @@ export const saveWallpaper = (wallpaper: Wallpaper): boolean => {
     localStorage.setItem(KEYS.WALLPAPERS, JSON.stringify(updated));
     return true;
   } catch (error) {
-    console.error("Storage Error:", error);
+    console.error("Storage Error (likely size limit):", error);
     return false;
   }
 };
 
 export const getFAQs = (): FAQItem[] => {
-  const data = localStorage.getItem(KEYS.FAQS);
-  if (!data) {
+  try {
+    const data = localStorage.getItem(KEYS.FAQS);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
     return [];
   }
-  return JSON.parse(data);
 };
 
 export const saveFAQs = (faqs: FAQItem[]) => {
